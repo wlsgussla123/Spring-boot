@@ -9,4 +9,5 @@ public interface CustomerService {
 	Customer getCustomer(Integer id);
 	Customer registerCustomer(Customer customer);
 	Customer updateCustomer(Integer id, Customer customer);
+	Customer deleteCustomer(Integer id);
 }

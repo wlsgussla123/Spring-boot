@@ -39,4 +39,17 @@ public class CustomerServiceImpl implements CustomerService {
 		
 		return customerRepository.save(updatedCustomer);
 	}
+
+	@Override
+	public Customer deleteCustomer(Integer id) {
+		Customer customer = customerRepository.findById(id)
+								.orElse(new Customer());
+		
+		if(customer == null) {
+			return null;
+		} else {
+			customerRepository.delete(customer);
+			return customer;
+		}
+	}
 }
