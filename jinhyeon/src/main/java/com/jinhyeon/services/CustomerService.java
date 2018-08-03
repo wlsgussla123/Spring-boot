@@ -6,4 +6,5 @@ import com.jinhyeon.entities.Customer;
 
 public interface CustomerService {
 	List<Customer> getAllCustomers();
+	Customer registerCustomer(Customer customer);
 }
