@@ -2,9 +2,8 @@ package com.jinhyeon.services;
 
 import java.util.List;
 
-import javax.swing.text.StyleConstants.ColorConstants;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -12,21 +11,37 @@ import com.jinhyeon.constants.Constants;
 import com.jinhyeon.entities.Customer;
 import com.jinhyeon.repositories.CustomerRepository;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class CustomerServiceImpl implements CustomerService {
 	@Autowired
 	private CustomerRepository customerRepository;
 	
 	@Override
-	@Cacheable(value = Constants.CACHE_CUSTOMER)
 	public List<Customer> getAllCustomers() {
 		return (List<Customer>) customerRepository.findAll();
 	}
 	
 	@Override
-	public Customer getCustomer(Integer id) {
+	public Customer getNoCacheCustomer(Integer id) {
+		slowQuery(2000);
 		return customerRepository.findById(id)
 				.orElseThrow(null);
+	}
+
+	@Override
+	@Cacheable(value = Constants.CACHE_VALUE, key = "#id")
+	public Customer getCacheCustomer(Integer id) {
+		slowQuery(2000);
+		return customerRepository.findById(id)
+				.orElseThrow(null);
+	}
+	
+	@Override
+	@CacheEvict(value = Constants.CACHE_VALUE, key = "#id")
+	public void refresh(Integer id) {
+		log.info(id + ">>>> cache clear");
 	}
 
 	@Override
@@ -57,4 +72,13 @@ public class CustomerServiceImpl implements CustomerService {
 			return customer;
 		}
 	}
+	
+    // 빅쿼리를 돌린다는 가정
+    private void slowQuery(long seconds) {
+        try {
+            Thread.sleep(seconds);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 }

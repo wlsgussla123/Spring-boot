@@ -29,9 +29,32 @@ public class CustomerController {
 		return customerService.getAllCustomers();
 	}
 	
-	@GetMapping(path = "/{id}")
-	public Customer getCustomer(@PathVariable(value = "id") Integer id) {
-		return customerService.getCustomer(id);
+	@GetMapping(path = "/nocache/{id}")
+	public Customer getNoCacheCustomer(@PathVariable(value = "id") Integer id) {
+		long start = System.currentTimeMillis();
+		Customer customer = customerService.getNoCacheCustomer(id);
+		long end = System.currentTimeMillis();
+		
+		log.info(">>>> nocache : " + Long.toString(end-start));
+		
+		return customer;
+	}
+	
+	@GetMapping(path = "/cache/{id}")
+	public Customer getCacheCustomer(@PathVariable(value = "id") Integer id) {
+		long start = System.currentTimeMillis();
+		Customer customer = customerService.getCacheCustomer(id);
+		long end = System.currentTimeMillis();
+		
+		log.info(">>>> cache : " + Long.toString(end-start));
+
+		return customer;
+	}
+	
+	@GetMapping(path = "/refresh/{id}")
+	public String refresh(@PathVariable(value = "id") Integer id) {
+		customerService.refresh(id);
+		return "cache clear";
 	}
 	
 	@PostMapping(path = "/")
